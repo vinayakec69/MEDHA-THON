@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Twin - Surgical Planner</title>
+    <link rel="stylesheet" href="style.css?v=23">
+    <!-- Google Fonts for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar / Controls -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>Twin<span>Med</span></h2>
+            </div>
+            
+            <div class="panel">
+                <h3>Patient Data</h3>
+                <div class="upload-area" id="uploadArea" onclick="startDemoUpload()" style="cursor: pointer;">
+                    <p style="font-size:16px;color:#00f0ff;margin-bottom:4px;">📂 Process CT Scans</p>
+                    <p style="font-size:12px;color:#64748b;margin-bottom:10px;">Click to load patient DICOM data</p>
+                    <div class="btn primary-btn" style="pointer-events:none;">Initialize 3D Twin</div>
+                    <div id="imagePreviewContainer" class="image-preview"></div>
+                </div>
+                <div class="patient-info">
+                    <p><strong>ID:</strong> #PT-8892</p>
+                    <p><strong>Joint:</strong> Right Shoulder</p>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>Implant Selection</h3>
+                <select class="custom-select">
+                    <option>Standard Humerus Head (45mm)</option>
+                    <option>Standard Humerus Head (48mm)</option>
+                    <option>Offset Humerus Head (52mm)</option>
+                </select>
+            </div>
+
+            <div class="panel">
+                <h3>Biomechanical Analysis</h3>
+                <div class="stat-row">
+                    <span>Alignment Angle:</span>
+                    <span class="stat-value text-green">132°</span>
+                </div>
+                <div class="stat-row">
+                    <span>Impingement Risk:</span>
+                    <span class="stat-value text-orange">12%</span>
+                </div>
+                <div class="stat-row">
+                    <span>Predicted Stability:</span>
+                    <span class="stat-value text-green">High</span>
+                </div>
+                <div class="stat-row" id="boneDensityRow">
+                    <span>Bone Density Score:</span>
+                    <span class="stat-value text-blue" id="boneDensityVal">Awaiting AI...</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 88%;"></div>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn action-btn" style="flex: 1; padding: 12px 10px;">Generate Surgical Report</button>
+                <button class="btn action-btn" id="simulateMovementBtn" style="flex: 1; padding: 12px 10px; background: rgba(34, 197, 94, 0.15); border-color: #22c55e; color: #4ade80;">Simulate Movement</button>
+            </div>
+        </aside>
+
+        <!-- Main 3D Viewport -->
+        <main class="viewport">
+            <div class="viewport-header">
+                <h3>3D Pre-Operative Planning View</h3>
+                <div class="viewport-controls">
+                    <button class="btn icon-btn">Front</button>
+                    <button class="btn icon-btn">Top</button>
+                    <button class="btn icon-btn">Side</button>
+                </div>
+            </div>
+            <div id="canvas-container">
+                <!-- Three.js Canvas will be injected here -->
+                <div class="loading-overlay" id="loadingOverlay">
+                    <p>Waiting for scan data...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Three.js loaded LOCALLY to prevent CORS/Network blocking -->
+    <script src="three.min.js"></script>
+    <script src="OrbitControls.js"></script>
+    <script src="app.js?v=23"></script>
+</body>
+</html>
