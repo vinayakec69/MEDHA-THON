@@ -30,28 +30,21 @@ TwinMed is completely decentralized and hardware-agnostic, leveraging lightweigh
 
 ```mermaid
 graph TD
-    %% Styling
-    classDef hardware fill:#0f172a,stroke:#00f0ff,stroke-width:2px,color:#00f0ff,rx:8px,ry:8px;
-    classDef process fill:#1e293b,stroke:#a855f7,stroke-width:2px,color:#e2e8f0,rx:8px,ry:8px;
-    classDef output fill:#1e293b,stroke:#22c55e,stroke-width:2px,color:#e2e8f0,rx:8px,ry:8px;
-
-    %% Nodes
-    A[🏥 PACS Server<br>Raw CT/DICOM Scans] :::hardware
+    A[🏥 PACS Server<br>Raw CT/DICOM Scans]
     
-    subgraph NVIDIA Jetson Edge Node [Local Edge Compute]
-        B[🧠 FastAPI Inference Engine<br>nnU-Net Bone Segmentation] :::process
-        C[📐 Geometric Landmarking<br>Axes & Deformity Analysis] :::process
-        D[📊 Biomechanical Engine<br>Impingement & ROM Checks] :::process
+    subgraph Edge Node [Local Edge Compute]
+        B[🧠 FastAPI Inference Engine<br>nnU-Net Bone Segmentation]
+        C[📐 Geometric Landmarking<br>Axes & Deformity Analysis]
+        D[📊 Biomechanical Engine<br>Impingement & ROM Checks]
     end
     
-    subgraph Surgeon Dashboard [Client Browser]
-        E[🧊 Three.js WebGL Engine<br>Procedural Bone Rendering] :::process
-        F[🛠 Interactive Planning<br>Implant Size Selection] :::process
+    subgraph Dashboard [Client Browser]
+        E[🧊 Three.js WebGL Engine<br>Procedural Bone Rendering]
+        F[🛠 Interactive Planning<br>Implant Size Selection]
     end
 
-    G[📄 Automated Clinical Report<br>PDF with ReportLab] :::output
+    G[📄 Automated Clinical Report<br>PDF with ReportLab]
 
-    %% Edges
     A -->|Secure Local Transfer| B
     B --> C
     C -->|JSON Payload| E
@@ -78,7 +71,7 @@ graph TD
 sequenceDiagram
     participant S as Surgeon
     participant U as TwinMed UI (WebGL)
-    participant B as FastAPI Edge Server
+    participant B as FastAPI Server
     participant AI as Jetson GPU (nnU-Net)
 
     S->>U: Securely upload DICOM scan
