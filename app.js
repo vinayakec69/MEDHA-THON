@@ -350,6 +350,7 @@ function buildBone() {
     // 1. HUMERUS (Upper Arm Bone)
     // =================================================================
     var humerusGroup = new THREE.Group();
+    humerusGroup.name = "humerusGroup";
 
     var humerusProfile = [
         new THREE.Vector2(0.01, -6.0),
@@ -672,7 +673,12 @@ function buildImplant(sizeKey) {
     implantGroup.position.set(0, 4.0, 0);
 
     if (boneGroup) {
-        boneGroup.add(implantGroup);
+        var hGroup = boneGroup.getObjectByName("humerusGroup");
+        if (hGroup) {
+            hGroup.add(implantGroup);
+        } else {
+            boneGroup.add(implantGroup);
+        }
     } else {
         scene.add(implantGroup);
     }
