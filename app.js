@@ -386,11 +386,7 @@ function buildBone() {
     humerusMesh.castShadow = true;
     humerusGroup.add(humerusMesh);
 
-    // Humeral Head Articular Cartilage cap
-    var cartGeo = new THREE.SphereGeometry(1.38, 32, 32, 0, Math.PI * 2, 0, Math.PI * 0.45);
-    var cartMesh = new THREE.Mesh(cartGeo, cartilageMat);
-    cartMesh.position.set(0, 4.1, 0);
-    humerusGroup.add(cartMesh);
+
 
     // Greater Tuberosity
     var gtGeo = new THREE.SphereGeometry(0.55, 24, 24);
@@ -445,33 +441,33 @@ function buildBone() {
     }));
     humerusGroup.add(innerWireframe);
 
-    // Angle humerus down-left like in the reference
-    humerusGroup.rotation.z = 0.25;
-    humerusGroup.position.set(-1.8, -1.0, 0);
+    // Angle humerus down-left, positioned so the head sits snugly in the glenoid
+    humerusGroup.rotation.z = 0.18;
+    humerusGroup.position.set(-0.6, -1.0, 0);
 
     // =================================================================
     // 2. GLENOHUMERAL JOINT (Green like Kenhub reference)
     // =================================================================
     var jointGroup = new THREE.Group();
 
-    // Labrum ring (green ring)
-    var labrumGeo = new THREE.TorusGeometry(1.25, 0.22, 16, 32);
-    perturbVertices(labrumGeo, 0.025);
+    // Labrum ring (green ring - subtle, matching Kenhub)
+    var labrumGeo = new THREE.TorusGeometry(1.1, 0.15, 16, 32);
+    perturbVertices(labrumGeo, 0.02);
     var labrumMesh = new THREE.Mesh(labrumGeo, jointCapsuleMat);
-    labrumMesh.position.set(0, 3.5, 0);
+    labrumMesh.position.set(0.4, 3.5, 0);
     labrumMesh.rotation.y = Math.PI / 2 + 0.15;
     jointGroup.add(labrumMesh);
 
-    // Joint capsule sleeve
-    var capsuleMat = new THREE.MeshStandardMaterial({
+    // Joint capsule sleeve (subtle wrap around the joint)
+    var capsuleMat2 = new THREE.MeshStandardMaterial({
         color: 0x27ae60, roughness: 0.5, metalness: 0.1,
-        transparent: true, opacity: 0.55, side: THREE.DoubleSide
+        transparent: true, opacity: 0.35, side: THREE.DoubleSide
     });
-    var capsuleGeo = new THREE.CylinderGeometry(1.5, 1.3, 1.8, 24, 1, true);
+    var capsuleGeo = new THREE.CylinderGeometry(1.3, 1.1, 1.2, 24, 1, true);
     perturbVertices(capsuleGeo, 0.02);
-    var capsuleMesh = new THREE.Mesh(capsuleGeo, capsuleMat);
-    capsuleMesh.position.set(-0.3, 3.5, 0);
-    capsuleMesh.rotation.z = 0.15;
+    var capsuleMesh = new THREE.Mesh(capsuleGeo, capsuleMat2);
+    capsuleMesh.position.set(0.1, 3.5, 0);
+    capsuleMesh.rotation.z = 0.12;
     jointGroup.add(capsuleMesh);
 
     // =================================================================
