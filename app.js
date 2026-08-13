@@ -437,7 +437,7 @@ function buildBone() {
 
     // Angle humerus down-left, positioned so the head sits snugly in the glenoid
     humerusGroup.rotation.z = 0.18;
-    humerusGroup.position.set(-0.6, -1.0, 0);
+    humerusGroup.position.set(1.3, -0.3, 0);
 
     // =================================================================
     // 2. GLENOHUMERAL JOINT (Green like Kenhub reference)
