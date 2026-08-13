@@ -550,7 +550,7 @@ function init3D() {
     });
 
     // Implant dropdown
-    var implantSelect = document.querySelector('.custom-select');
+    var implantSelect = document.querySelector('select.custom-select');
     if (implantSelect) {
         implantSelect.addEventListener('change', function() {
             var val = implantSelect.value;
