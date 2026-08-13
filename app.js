@@ -297,79 +297,97 @@ var BIO_DATA = {
 };
 
 // =====================================================================
-// BUILD BONE
+// BUILD BONE (Anatomical Shoulder)
 // =====================================================================
 function buildBone() {
     if (boneGroup) { scene.remove(boneGroup); }
     boneGroup = new THREE.Group();
 
-    var outerPoints = [
-        new THREE.Vector2(0,    -3.8),
-        new THREE.Vector2(1.35, -3.5),
-        new THREE.Vector2(1.15, -2.8),
-        new THREE.Vector2(0.7,  -2.2),
-        new THREE.Vector2(0.55, -1.0),
-        new THREE.Vector2(0.52,  0.0),
-        new THREE.Vector2(0.55,  1.5),
-        new THREE.Vector2(0.65,  2.2),
-        new THREE.Vector2(0.85,  2.8),
-        new THREE.Vector2(1.55,  3.5),
-        new THREE.Vector2(1.45,  3.9),
-        new THREE.Vector2(0,     4.1),
-    ];
-    corticalBone = new THREE.Mesh(
-        new THREE.LatheGeometry(outerPoints, 48),
-        new THREE.MeshStandardMaterial({
-            color: 0xe8e0cc,
-            roughness: 0.85,
-            metalness: 0.05,
-            side: THREE.FrontSide
-        })
-    );
-    corticalBone.castShadow = true;
-    boneGroup.add(corticalBone);
-
-    // Inner Cancellous (spongy) Bone
-    var innerPoints = outerPoints.map(function(p) { return new THREE.Vector2(p.x * 0.58, p.y * 0.96); });
-    innerBone = new THREE.Mesh(
-        new THREE.LatheGeometry(innerPoints, 48),
-        new THREE.MeshStandardMaterial({
-            color: 0xc8934a,
-            roughness: 1.0,
-            metalness: 0.0,
-            side: THREE.FrontSide
-        })
-    );
-    boneGroup.add(innerBone);
-
-    // Trabecular Wireframe
-    innerWireframe = new THREE.Mesh(
-        new THREE.LatheGeometry(innerPoints, 10, 6),
-        new THREE.MeshBasicMaterial({
-            color: 0xa07030,
-            wireframe: true,
-            transparent: true,
-            opacity: 0.0
-        })
-    );
-    boneGroup.add(innerWireframe);
-
-    // AI Anatomical Landmarks (Red Spheres)
-    var landmarkGeom = new THREE.SphereGeometry(0.12, 16, 16);
-    var landmarkMat = new THREE.MeshBasicMaterial({ color: 0xff3333 });
-    var landmarkPositions = [
-        new THREE.Vector3(1.5, 3.2, 0),
-        new THREE.Vector3(-1.3, 3.4, 0.5),
-        new THREE.Vector3(0, 4.1, 0)
-    ];
-    landmarkPositions.forEach(function(pos) {
-        var marker = new THREE.Mesh(landmarkGeom, landmarkMat);
-        marker.position.copy(pos);
-        boneGroup.add(marker);
+    var boneMaterial = new THREE.MeshStandardMaterial({
+        color: 0xe8e0cc,
+        roughness: 0.85,
+        metalness: 0.05,
+        side: THREE.DoubleSide
     });
 
-    boneGroup.position.y = -0.5;
-    boneGroup.rotation.z = 0.08;
+    // --- 1. HUMERUS (Upper Arm) ---
+    var humerusGroup = new THREE.Group();
+    
+    // Humerus Head (The Ball)
+    var hHead = new THREE.Mesh(new THREE.SphereGeometry(1.6, 32, 32), boneMaterial);
+    hHead.scale.set(1, 1.1, 0.9);
+    hHead.position.set(0, 4.0, 0); // Exact pivot point for implant
+    hHead.castShadow = true;
+    humerusGroup.add(hHead);
+    
+    // Greater Tuberosity (Outer Bump)
+    var gTube = new THREE.Mesh(new THREE.SphereGeometry(0.8, 16, 16), boneMaterial);
+    gTube.scale.set(1.5, 2, 1);
+    gTube.position.set(-1.2, 3.7, 0.4);
+    gTube.rotation.z = 0.4;
+    humerusGroup.add(gTube);
+
+    // Humerus Shaft
+    var hShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.9, 0.6, 8, 32), boneMaterial);
+    hShaft.position.set(-0.3, 0, 0);
+    hShaft.rotation.z = -0.1;
+    hShaft.castShadow = true;
+    humerusGroup.add(hShaft);
+    
+    // Epicondyles (Elbow joint base)
+    var elbowBase = new THREE.Mesh(new THREE.SphereGeometry(1.0, 32, 32), boneMaterial);
+    elbowBase.scale.set(1.5, 0.8, 0.6);
+    elbowBase.position.set(-0.7, -4.0, 0);
+    humerusGroup.add(elbowBase);
+
+    // --- 2. SCAPULA (Shoulder Blade) ---
+    var scapulaGroup = new THREE.Group();
+    
+    // Glenoid Cavity (The Socket)
+    var glenoid = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.3, 0.5, 32), boneMaterial);
+    glenoid.rotation.z = Math.PI / 2;
+    glenoid.rotation.y = -0.2;
+    glenoid.position.set(1.8, 3.8, 0);
+    scapulaGroup.add(glenoid);
+    
+    // Scapula Body (The flat triangular wing on the back)
+    var scapBody = new THREE.Mesh(new THREE.CylinderGeometry(3.5, 0.5, 7, 3), boneMaterial);
+    scapBody.scale.set(1, 1, 0.2);
+    scapBody.rotation.z = 0.5;
+    scapBody.position.set(4.5, 0.5, -1.5);
+    scapulaGroup.add(scapBody);
+    
+    // Acromion (The bone roof over the shoulder)
+    var acromion = new THREE.Mesh(new THREE.TorusGeometry(2.2, 0.4, 16, 32, Math.PI), boneMaterial);
+    acromion.rotation.x = Math.PI / 2;
+    acromion.position.set(2.2, 5.8, 0);
+    scapulaGroup.add(acromion);
+
+    // --- 3. CLAVICLE (Collarbone) ---
+    var claviclePath = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(2.2, 5.8, 2.2),
+        new THREE.Vector3(4.5, 6.0, 4.0),
+        new THREE.Vector3(8.0, 5.5, 5.0)
+    ]);
+    var clavicle = new THREE.Mesh(new THREE.TubeGeometry(claviclePath, 20, 0.4, 8, false), boneMaterial);
+    scapulaGroup.add(clavicle);
+
+    // Assemble the full anatomy
+    boneGroup.add(humerusGroup);
+    boneGroup.add(scapulaGroup);
+    
+    // Center the whole joint in the viewport
+    boneGroup.position.set(-1, -1.5, 0);
+
+    // Add Red AI Landmarks to prove segmentation points
+    var markerGeo = new THREE.SphereGeometry(0.15, 16, 16);
+    var markerMat = new THREE.MeshBasicMaterial({ color: 0xff3333 });
+    
+    var m1 = new THREE.Mesh(markerGeo, markerMat); m1.position.set(-1.8, 3.8, 0.4);
+    var m2 = new THREE.Mesh(markerGeo, markerMat); m2.position.set(0, 5.2, 0);
+    var m3 = new THREE.Mesh(markerGeo, markerMat); m3.position.set(1.2, 3.2, 0.2);
+    humerusGroup.add(m1); humerusGroup.add(m2); humerusGroup.add(m3);
+
     scene.add(boneGroup);
 }
 
