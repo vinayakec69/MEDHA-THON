@@ -369,17 +369,10 @@ function buildBone() {
         new THREE.Vector2(0.50,  1.6),
         new THREE.Vector2(0.60,  2.2),
         new THREE.Vector2(0.75,  2.7),
-        new THREE.Vector2(0.92,  3.1),
-        new THREE.Vector2(1.10,  3.4),
-        new THREE.Vector2(1.25,  3.6),
-        new THREE.Vector2(1.35,  3.8),
-        new THREE.Vector2(1.40,  4.0),
-        new THREE.Vector2(1.38,  4.2),
-        new THREE.Vector2(1.30,  4.4),
-        new THREE.Vector2(1.15,  4.6),
-        new THREE.Vector2(0.90,  4.8),
-        new THREE.Vector2(0.55,  4.95),
-        new THREE.Vector2(0.01,  5.0),
+        new THREE.Vector2(0.95,  3.0),
+        // SURGICAL CUT: Resect the anatomical head so implant collar sits flush
+        new THREE.Vector2(1.05,  3.2), // Outer cortex of cut
+        new THREE.Vector2(0.01,  3.2), // Flat resected top
     ];
     var humerusGeo = createBoneLathe(humerusProfile, 48);
     perturbVertices(humerusGeo, 0.012);
@@ -642,13 +635,17 @@ function buildImplant(sizeKey) {
         new THREE.SphereGeometry(cfg.headRadius, 40, 40),
         titanium
     );
+    // Center the head so its base rests perfectly on the collar
+    head.position.y = -0.8 + (cfg.headRadius * 0.6);
     head.castShadow = true;
 
     var collar = new THREE.Mesh(
         new THREE.CylinderGeometry(cfg.stemRadius * 1.4, cfg.stemRadius * 1.4, 0.2, 32),
         titanium
     );
-    collar.position.y = -(cfg.headRadius * 0.7);
+    // Fix collar at exactly y = -0.8 relative to implantGroup (which is at y = 4.0).
+    // This perfectly aligns it with the flat bone cut at y = 3.2!
+    collar.position.y = -0.8; 
 
     var stemPoints = [
         new THREE.Vector2(0, 0),
@@ -663,7 +660,7 @@ function buildImplant(sizeKey) {
         titanium
     );
     stem.rotation.x = Math.PI;
-    stem.position.y = -(cfg.headRadius * 0.7 + 0.1);
+    stem.position.y = -0.9; // Just below the collar
     stem.castShadow = true;
 
     implantGroup.add(head);
