@@ -573,10 +573,10 @@ function buildBone() {
     // =================================================================
     var clavPath = new THREE.CatmullRomCurve3([
         new THREE.Vector3(-0.3, 5.2, 0.4),
-        new THREE.Vector3(-1.5, 5.6, 1.5),
-        new THREE.Vector3(-3.0, 5.9, 3.0),
-        new THREE.Vector3(-4.5, 5.7, 4.0),
-        new THREE.Vector3(-6.0, 5.3, 4.5),
+        new THREE.Vector3(1.5, 5.6, 1.5),
+        new THREE.Vector3(3.5, 5.9, 2.5),
+        new THREE.Vector3(5.0, 5.7, 3.5),
+        new THREE.Vector3(6.5, 5.3, 4.0),
     ]);
     var clavGeo = new THREE.TubeGeometry(clavPath, 24, 0.35, 10, false);
     perturbVertices(clavGeo, 0.018);
@@ -586,7 +586,7 @@ function buildBone() {
     var sternalEnd = new THREE.Mesh(new THREE.SphereGeometry(0.45, 12, 12), corticalMat);
     perturbVertices(sternalEnd.geometry, 0.03);
     sternalEnd.scale.set(1.0, 0.6, 1.2);
-    sternalEnd.position.set(-6.0, 5.3, 4.5);
+    sternalEnd.position.set(6.5, 5.3, 4.0);
     scapulaGroup.add(sternalEnd);
 
     // AC Joint
