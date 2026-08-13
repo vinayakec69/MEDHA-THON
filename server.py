@@ -276,6 +276,19 @@ async def log_error(request: Request):
     print(f"\n\n🚨 [FRONTEND UI ERROR CAUGHT]: {data}\n\n")
     return {"status": "logged"}
 
+# ---------- Scan Local Directory (Bypass Browser Sandbox) ----------
+@app.post("/api/scan-local-dir")
+async def scan_local_dir(directory_path: str = Form(...)):
+    import os
+    try:
+        if os.path.exists(directory_path) and os.path.isdir(directory_path):
+            files = [f for f in os.listdir(directory_path) if os.path.isfile(os.path.join(directory_path, f))]
+            return {"status": "success", "file_count": len(files)}
+        else:
+            return {"status": "error", "file_count": 0, "msg": "Directory not found or is not a folder"}
+    except Exception as e:
+        return {"status": "error", "file_count": 0, "msg": str(e)}
+
 # ---------- Mount Static Files at ROOT (must be LAST, after all API routes) ----------
 app.mount("/", StaticFiles(directory=STATIC_DIR), name="root_static")
 

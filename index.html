@@ -18,11 +18,12 @@
             
             <div class="panel">
                 <h3>Patient Data</h3>
-                <div class="upload-area" id="uploadArea" onclick="startDemoUpload()" style="cursor: pointer;">
-                    <p style="font-size:16px;color:#00f0ff;margin-bottom:4px;">📂 Process CT Scans</p>
-                    <p style="font-size:12px;color:#64748b;margin-bottom:10px;">Click to load patient DICOM data</p>
-                    <div class="btn primary-btn" style="pointer-events:none;">Initialize 3D Twin</div>
-                    <div id="imagePreviewContainer" class="image-preview"></div>
+                <div class="upload-area" id="uploadArea">
+                    <p style="font-size:16px;color:#00f0ff;margin-bottom:4px;">📂 Process Local Directory</p>
+                    <p style="font-size:12px;color:#64748b;margin-bottom:10px;">Paste the absolute path to the DICOM folder</p>
+                    <input type="text" id="localDirPath" class="custom-select" style="margin-bottom:10px; width:100%; background:rgba(15,23,42,0.6); border:1px solid #334155; color:#e2e8f0; padding:8px; font-size:12px; border-radius:6px;" placeholder="e.g. /home/krish/medha thon/ppt_images" value="/home/krish/medha thon/ppt_images">
+                    <div class="btn primary-btn" onclick="startLocalDirUpload()" style="cursor: pointer;">Load Patient Directory</div>
+                    <div id="imagePreviewContainer" class="image-preview" style="margin-top: 10px;"></div>
                 </div>
                 <div class="patient-info">
                     <p><strong>ID:</strong> #PT-8892</p>

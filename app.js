@@ -48,16 +48,23 @@ function setOverlayProgress(statusText, percent, labelText) {
 // Setup overlay immediately
 setupOverlay();
 
-// --- FILE UPLOAD (Real File Picker) ---
-// --- FILE UPLOAD (Mock Demo Mode for Video Recording) ---
-window.startDemoUpload = function() {
+// --- FILE UPLOAD (Native Jetson Bypass) ---
+window.startLocalDirUpload = function() {
+    var pathInput = document.getElementById('localDirPath');
+    var targetPath = pathInput ? pathInput.value : '';
+    
+    if (!targetPath) {
+        alert("Please enter a valid directory path.");
+        return;
+    }
+
     var overlay = document.getElementById('loadingOverlay');
     if (overlay) {
         overlay.style.opacity = '1';
         overlay.style.pointerEvents = 'auto';
     }
     
-    // Create fake thumbnails for the video
+    // Create fast dummy thumbnails
     var previewContainer = document.getElementById('imagePreviewContainer');
     if (previewContainer) {
         previewContainer.innerHTML = '';
@@ -68,8 +75,30 @@ window.startDemoUpload = function() {
         }
     }
     
-    // Simulate reading 342 files
-    startAnimation(342, overlay);
+    var formData = new FormData();
+    formData.append('directory_path', targetPath);
+
+    // Ask FastAPI to natively read the directory, bypassing the Ubuntu Sandbox freeze
+    fetch('/api/scan-local-dir', { method: 'POST', body: formData })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            if (data.status === 'success') {
+                startAnimation(data.file_count, overlay);
+            } else {
+                alert("Error from server: " + data.msg);
+                if (overlay) {
+                    overlay.style.opacity = '0';
+                    overlay.style.pointerEvents = 'none';
+                }
+            }
+        })
+        .catch(function(err) {
+            alert("Backend communication failed.");
+            if (overlay) {
+                overlay.style.opacity = '0';
+                overlay.style.pointerEvents = 'none';
+            }
+        });
 };
 
 // Proportional loading time
