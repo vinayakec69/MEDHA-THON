@@ -795,13 +795,52 @@ function init3D() {
 
     // Camera snap buttons
     document.querySelectorAll('.icon-btn').forEach(function(btn) {
-        if (btn.id === 'xrayBtn') return; // Skip xray button for camera logic
+        if (btn.id === 'xrayBtn' || btn.id === 'cutGuideBtn') return; // Skip special toggles
         btn.addEventListener('click', function() {
-            document.querySelectorAll('.icon-btn:not(#xrayBtn)').forEach(function(b) { b.classList.remove('active'); });
+            document.querySelectorAll('.icon-btn:not(#xrayBtn):not(#cutGuideBtn)').forEach(function(b) { b.classList.remove('active'); });
             btn.classList.add('active');
             snapCamera(btn.innerText.trim());
         });
     });
+
+    // Cutting Guide Toggle
+    var cutGuideBtn = document.getElementById('cutGuideBtn');
+    var isCutGuide = false;
+    var cutPlane = null;
+    if (cutGuideBtn) {
+        cutGuideBtn.addEventListener('click', function() {
+            isCutGuide = !isCutGuide;
+            if (isCutGuide) {
+                cutGuideBtn.style.background = '#f39c12';
+                cutGuideBtn.style.color = '#0f172a';
+                
+                // Add the resection plane to boneGroup if it doesn't exist
+                if (!cutPlane && boneGroup) {
+                    var planeGeo = new THREE.PlaneGeometry(5, 5);
+                    var planeMat = new THREE.MeshBasicMaterial({ color: 0xf39c12, transparent: true, opacity: 0.4, side: THREE.DoubleSide });
+                    cutPlane = new THREE.Mesh(planeGeo, planeMat);
+                    
+                    // The humerus resection happens around y = 3.2, but the implant group sits at y=4.0
+                    // Let's place the plane slightly above the cut to show where the saw would go.
+                    cutPlane.rotation.x = Math.PI / 2;
+                    cutPlane.position.set(0, 3.2, 0); 
+                    
+                    // Add grid lines for a more technical look
+                    var grid = new THREE.GridHelper(5, 10, 0xffaa00, 0xffaa00);
+                    grid.rotation.x = Math.PI / 2;
+                    cutPlane.add(grid);
+                    
+                    boneGroup.add(cutPlane);
+                } else if (cutPlane) {
+                    cutPlane.visible = true;
+                }
+            } else {
+                cutGuideBtn.style.background = 'transparent';
+                cutGuideBtn.style.color = '#f39c12';
+                if (cutPlane) cutPlane.visible = false;
+            }
+        });
+    }
 
     // X-Ray Mode Toggle
     var xrayBtn = document.getElementById('xrayBtn');
