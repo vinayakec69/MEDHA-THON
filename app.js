@@ -635,6 +635,7 @@ function buildImplant(sizeKey) {
         new THREE.SphereGeometry(cfg.headRadius, 40, 40),
         titanium
     );
+    head.name = 'implant';
     // Center the head so its base rests perfectly on the collar
     head.position.y = -0.8 + (cfg.headRadius * 0.6);
     head.castShadow = true;
@@ -643,6 +644,7 @@ function buildImplant(sizeKey) {
         new THREE.CylinderGeometry(cfg.stemRadius * 1.4, cfg.stemRadius * 1.4, 0.2, 32),
         titanium
     );
+    collar.name = 'implant';
     // Fix collar at exactly y = -0.8 relative to implantGroup (which is at y = 4.0).
     // This perfectly aligns it with the flat bone cut at y = 3.2!
     collar.position.y = -0.8; 
@@ -659,6 +661,7 @@ function buildImplant(sizeKey) {
         new THREE.LatheGeometry(stemPoints, 24),
         titanium
     );
+    stem.name = 'implant';
     stem.rotation.x = Math.PI;
     stem.position.y = -0.9; // Just below the collar
     stem.castShadow = true;
@@ -792,12 +795,38 @@ function init3D() {
 
     // Camera snap buttons
     document.querySelectorAll('.icon-btn').forEach(function(btn) {
+        if (btn.id === 'xrayBtn') return; // Skip xray button for camera logic
         btn.addEventListener('click', function() {
-            document.querySelectorAll('.icon-btn').forEach(function(b) { b.classList.remove('active'); });
+            document.querySelectorAll('.icon-btn:not(#xrayBtn)').forEach(function(b) { b.classList.remove('active'); });
             btn.classList.add('active');
             snapCamera(btn.innerText.trim());
         });
     });
+
+    // X-Ray Mode Toggle
+    var xrayBtn = document.getElementById('xrayBtn');
+    var isXray = false;
+    if (xrayBtn) {
+        xrayBtn.addEventListener('click', function() {
+            isXray = !isXray;
+            if (isXray) {
+                xrayBtn.style.background = '#00f0ff';
+                xrayBtn.style.color = '#0f172a';
+            } else {
+                xrayBtn.style.background = 'transparent';
+                xrayBtn.style.color = '#00f0ff';
+            }
+            
+            if (boneGroup) {
+                boneGroup.traverse(function(child) {
+                    if (child.isMesh && child.material && child.name !== 'implant') {
+                        child.material.transparent = true;
+                        child.material.opacity = isXray ? 0.25 : 1.0;
+                    }
+                });
+            }
+        });
+    }
 
     // Implant dropdown
     var implantSelect = document.querySelector('select.custom-select');
