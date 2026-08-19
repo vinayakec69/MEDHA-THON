@@ -596,11 +596,46 @@ function buildBone() {
     scapulaGroup.add(acjMesh);
 
     // =================================================================
+    // 5. VASCULAR SYSTEM (Arteries & Veins)
+    // =================================================================
+    var vascularGroup = new THREE.Group();
+    vascularGroup.name = "vascularSystem";
+    vascularGroup.visible = false; // Hidden by default
+    
+    var arteryMat = new THREE.MeshPhongMaterial({ color: 0xff3333, shininess: 30 });
+    var veinMat = new THREE.MeshPhongMaterial({ color: 0x3366ff, shininess: 30 });
+
+    // Axillary Artery (wrapping under clavicle and down the arm)
+    var arteryPath = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(4.0, 4.0, 3.5), // From chest
+        new THREE.Vector3(1.0, 3.0, 2.0), // Under clavicle
+        new THREE.Vector3(-0.5, 2.0, 1.5), // Past shoulder joint
+        new THREE.Vector3(0.0, -1.0, 1.0), // Down the humerus
+        new THREE.Vector3(0.2, -4.0, 1.2),
+        new THREE.Vector3(0.5, -8.0, 1.0)
+    ]);
+    var arteryGeo = new THREE.TubeGeometry(arteryPath, 64, 0.15, 8, false);
+    vascularGroup.add(new THREE.Mesh(arteryGeo, arteryMat));
+
+    // Cephalic Vein (running along the outside)
+    var veinPath = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(2.5, 4.5, 3.0),
+        new THREE.Vector3(0.5, 3.8, 2.5),
+        new THREE.Vector3(-1.0, 2.5, 1.8),
+        new THREE.Vector3(-1.5, 0.0, 1.5),
+        new THREE.Vector3(-1.2, -3.0, 1.6),
+        new THREE.Vector3(-0.8, -7.0, 1.4)
+    ]);
+    var veinGeo = new THREE.TubeGeometry(veinPath, 64, 0.12, 8, false);
+    vascularGroup.add(new THREE.Mesh(veinGeo, veinMat));
+
+    // =================================================================
     // ASSEMBLE
     // =================================================================
     boneGroup.add(humerusGroup);
     boneGroup.add(jointGroup);
     boneGroup.add(scapulaGroup);
+    boneGroup.add(vascularGroup);
     boneGroup.position.set(0, -0.5, 0);
 
     // AI Segmentation Landmarks
@@ -795,13 +830,36 @@ function init3D() {
 
     // Camera snap buttons
     document.querySelectorAll('.icon-btn').forEach(function(btn) {
-        if (btn.id === 'xrayBtn' || btn.id === 'cutGuideBtn') return; // Skip special toggles
+        if (btn.id === 'xrayBtn' || btn.id === 'cutGuideBtn' || btn.id === 'veinBtn') return; // Skip special toggles
         btn.addEventListener('click', function() {
-            document.querySelectorAll('.icon-btn:not(#xrayBtn):not(#cutGuideBtn)').forEach(function(b) { b.classList.remove('active'); });
+            document.querySelectorAll('.icon-btn:not(#xrayBtn):not(#cutGuideBtn):not(#veinBtn)').forEach(function(b) { b.classList.remove('active'); });
             btn.classList.add('active');
             snapCamera(btn.innerText.trim());
         });
     });
+
+    // Vascular System Toggle
+    var veinBtn = document.getElementById('veinBtn');
+    var isVein = false;
+    if (veinBtn) {
+        veinBtn.addEventListener('click', function() {
+            isVein = !isVein;
+            if (isVein) {
+                veinBtn.style.background = '#e74c3c';
+                veinBtn.style.color = '#0f172a';
+            } else {
+                veinBtn.style.background = 'transparent';
+                veinBtn.style.color = '#e74c3c';
+            }
+            
+            if (boneGroup) {
+                var vascularGroup = boneGroup.getObjectByName("vascularSystem");
+                if (vascularGroup) {
+                    vascularGroup.visible = isVein;
+                }
+            }
+        });
+    }
 
     // Cutting Guide Toggle
     var cutGuideBtn = document.getElementById('cutGuideBtn');
