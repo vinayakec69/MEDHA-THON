@@ -603,13 +603,15 @@ function buildBone() {
 
     // =================================================================
     // 5. VASCULAR SYSTEM (Arteries & Veins)
-    // Coordinate reference:
-    //   Humerus center axis is at x≈1.3, z≈0 (due to humerusGroup offset)
-    //   Humerus radius is ~0.4-1.05. Surgical neck at y≈2.5-3.2
-    //   Clavicle runs y≈5.2-5.9, z≈0.4-4.0
-    //   Acromion top at y≈5.3
-    //   Coracoid tip at (-0.8, 3.8, 1.6)
-    // ALL vessels must stay OUTSIDE these volumes.
+    // After humerus rotation (z=0.18) and offset (1.3, -0.3, 0):
+    //   Humerus head in boneGroup space: ~(1.8, 2.9, 0)
+    //   Greater tuberosity: ~(1.8, 3.0, 0.2), extends x: 1.1-2.5
+    //   Glenoid: (0.8, 3.5, 0)
+    //   Joint capsule: (0.1, 3.5, 0) radius 1.3
+    //   Clavicle: y≈5.2-5.9
+    //   Mid-shaft humerus at y≈0: center ~(1.3, 0, 0), radius ~0.4
+    // Strategy: circumflex arteries at y≈0.5 (mid-shaft, small radius)
+    //           axillary stays at x≥3.0 near joint, drops medially
     // =================================================================
     var vascularGroup = new THREE.Group();
     vascularGroup.name = "vascularSystem";
@@ -618,72 +620,70 @@ function buildBone() {
     var arteryMat = new THREE.MeshPhongMaterial({ color: 0xcc2222, shininess: 50 });
     var veinMat = new THREE.MeshPhongMaterial({ color: 0x2255cc, shininess: 50 });
 
-    // 1. Axillary Artery — runs UNDER the clavicle (y<4.5), FORWARD of the joint (z>2)
-    //    then drops down the MEDIAL side of the humerus (x>2, i.e. away from body center)
+    // 1. Axillary Artery — stays far medial (x≥3) near joint, then drops
     var axillaryArteryPath = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(5.5, 4.5, 4.5),  // Origin from subclavian, well below clavicle y≈5.5
-        new THREE.Vector3(3.5, 3.5, 3.5),  // Dips under clavicle
-        new THREE.Vector3(2.5, 2.5, 2.5),  // Past coracoid, in front of joint
-        new THREE.Vector3(2.5, 0.0, 2.0),  // Medial to humerus (humerus is at x=1.3)
-        new THREE.Vector3(2.5, -3.0, 1.5), // Continuing down
-        new THREE.Vector3(2.5, -6.0, 1.2)  // Brachial artery territory
+        new THREE.Vector3(5.5, 4.0, 4.5),  // From subclavian, below clavicle
+        new THREE.Vector3(3.5, 3.0, 3.0),  // Well medial to GT (GT ends at x≈2.5)
+        new THREE.Vector3(3.0, 1.5, 2.5),  // Dropping down, still medial
+        new THREE.Vector3(2.8, 0.0, 2.0),  // Past joint, medial to shaft
+        new THREE.Vector3(2.5, -3.0, 1.5),
+        new THREE.Vector3(2.5, -6.0, 1.2)
     ]);
     vascularGroup.add(new THREE.Mesh(
         new THREE.TubeGeometry(axillaryArteryPath, 64, 0.15, 8, false), arteryMat));
 
-    // 2. Anterior Circumflex Humeral Artery — wraps FRONT of surgical neck
-    //    Stays at z > 1.5 (in front) and loops around the humerus at y≈2.5
+    // 2. Anterior Circumflex — wraps FRONT of mid-shaft at y≈0.5
+    //    Shaft center at this level: ~(1.3, 0.5, 0), radius ~0.42
+    //    Circle must stay > 0.7 from center, so z > 0.7 or z < -0.7
     var antCircPath = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(2.5, 2.5, 2.5),  // Branches from axillary
-        new THREE.Vector3(1.3, 2.5, 1.8),  // Front of humerus (at humerus x, but z offset)
-        new THREE.Vector3(0.0, 2.5, 1.5),  // Lateral side, still in front
-        new THREE.Vector3(-0.5, 2.5, 0.5)  // Wraps to lateral-posterior
+        new THREE.Vector3(2.8, 0.5, 2.0),  // Branches from axillary
+        new THREE.Vector3(1.3, 0.5, 1.5),  // Front of shaft (z=1.5 >> radius 0.42)
+        new THREE.Vector3(-0.2, 0.5, 1.2), // Wrapping lateral-front
+        new THREE.Vector3(-0.5, 0.5, 0.0)  // Lateral side
     ]);
     vascularGroup.add(new THREE.Mesh(
         new THREE.TubeGeometry(antCircPath, 32, 0.07, 8, false), arteryMat));
 
-    // 3. Posterior Circumflex Humeral Artery — wraps BACK of surgical neck
-    //    Goes behind the humerus (z < 0) at the same y≈2.5 level
+    // 3. Posterior Circumflex — wraps BACK of mid-shaft at y≈0.5
     var postCircPath = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(2.5, 2.5, 2.5),  // Branches from axillary
-        new THREE.Vector3(2.5, 2.5, 0.0),  // Swings behind humerus
-        new THREE.Vector3(1.3, 2.5, -1.2), // Behind humerus center
-        new THREE.Vector3(0.0, 2.5, -0.8), // Continuing around
-        new THREE.Vector3(-0.5, 2.5, 0.5)  // Meets anterior branch
+        new THREE.Vector3(2.8, 0.5, 2.0),  // Branches from axillary
+        new THREE.Vector3(2.5, 0.5, -0.5), // Swings behind shaft
+        new THREE.Vector3(1.3, 0.5, -1.5), // Behind shaft center (z=-1.5)
+        new THREE.Vector3(-0.2, 0.5, -1.0),// Continuing around
+        new THREE.Vector3(-0.5, 0.5, 0.0)  // Meets anterior
     ]);
     vascularGroup.add(new THREE.Mesh(
         new THREE.TubeGeometry(postCircPath, 40, 0.08, 8, false), arteryMat));
 
-    // 4. Suprascapular Artery — runs ABOVE acromion (y > 5.5) then descends posterior
+    // 4. Suprascapular Artery — well ABOVE clavicle (y > 6.0)
     var supraScapPath = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(4.0, 5.8, 2.5),  // Above clavicle
-        new THREE.Vector3(2.0, 5.8, 0.5),  // Over acromion top (y=5.3 + clearance)
-        new THREE.Vector3(0.0, 5.6, -0.5), // Over the spine of scapula
-        new THREE.Vector3(-1.0, 4.5, -1.0) // Down posterior scapula
+        new THREE.Vector3(4.0, 6.2, 2.5),
+        new THREE.Vector3(2.0, 6.2, 0.5),
+        new THREE.Vector3(0.0, 6.0, -0.5),
+        new THREE.Vector3(-1.0, 5.0, -1.0)
     ]);
     vascularGroup.add(new THREE.Mesh(
         new THREE.TubeGeometry(supraScapPath, 40, 0.07, 8, false), arteryMat));
 
-    // 5. Axillary Vein — parallels the artery but slightly more anterior (z + 0.5)
+    // 5. Axillary Vein — parallels artery, offset z+0.5
     var axillaryVeinPath = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(5.5, 4.3, 5.0),  
-        new THREE.Vector3(3.5, 3.3, 4.0),  
-        new THREE.Vector3(2.5, 2.3, 3.0),  
-        new THREE.Vector3(2.8, 0.0, 2.5),  
-        new THREE.Vector3(2.8, -3.0, 2.0), 
-        new THREE.Vector3(2.8, -6.0, 1.7)  
+        new THREE.Vector3(5.5, 3.8, 5.0),
+        new THREE.Vector3(3.8, 2.8, 3.5),
+        new THREE.Vector3(3.3, 1.3, 3.0),
+        new THREE.Vector3(3.1, 0.0, 2.5),
+        new THREE.Vector3(2.8, -3.0, 2.0),
+        new THREE.Vector3(2.8, -6.0, 1.7)
     ]);
     vascularGroup.add(new THREE.Mesh(
         new THREE.TubeGeometry(axillaryVeinPath, 64, 0.18, 8, false), veinMat));
 
-    // 6. Cephalic Vein — runs on the LATERAL surface (x < 0, z > 1)
-    //    This is the superficial vein surgeons see first
+    // 6. Cephalic Vein — far lateral (x < 0) and in front (z > 1.5)
     var cephalicPath = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(1.0, 5.0, 2.5),  // Near deltopectoral groove, above joint
-        new THREE.Vector3(-0.5, 3.5, 2.5), // Lateral to humerus head
-        new THREE.Vector3(-0.5, 1.0, 2.0), // Down lateral arm
-        new THREE.Vector3(-0.3, -2.0, 1.8),
-        new THREE.Vector3(-0.2, -5.0, 1.5),
+        new THREE.Vector3(0.5, 4.5, 3.0),
+        new THREE.Vector3(-0.8, 3.0, 2.8),
+        new THREE.Vector3(-0.8, 1.0, 2.2),
+        new THREE.Vector3(-0.5, -2.0, 1.8),
+        new THREE.Vector3(-0.3, -5.0, 1.5),
         new THREE.Vector3(0.0, -7.0, 1.3)
     ]);
     vascularGroup.add(new THREE.Mesh(
