@@ -627,9 +627,9 @@ function buildBone() {
     // 2. Anterior Circumflex Humeral Artery (Wraps front of surgical neck closely)
     var antCircumflexPath = new THREE.CatmullRomCurve3([
         new THREE.Vector3(-0.1, 1.5, 2.2),  
-        new THREE.Vector3(-0.8, 1.5, 2.5),  // Pushed further out in Z
-        new THREE.Vector3(-2.0, 1.4, 2.0),  // Pushed further out in X and Z
-        new THREE.Vector3(-2.5, 1.3, 0.5)   // Ends further out
+        new THREE.Vector3(-0.8, 1.5, 2.3),  
+        new THREE.Vector3(-1.8, 1.4, 1.8),
+        new THREE.Vector3(-2.2, 1.3, 0.5)   
     ]);
     var antCircumflexMesh = new THREE.Mesh(new THREE.TubeGeometry(antCircumflexPath, 32, 0.08, 8, false), arteryMat);
     antCircumflexMesh.userData = { name: "Anterior Circumflex Humeral Artery" };
@@ -638,21 +638,20 @@ function buildBone() {
     // 3. Posterior Circumflex Humeral Artery (Wraps back of surgical neck)
     var postCircumflexPath = new THREE.CatmullRomCurve3([
         new THREE.Vector3(-0.1, 1.5, 2.2),  
-        new THREE.Vector3(1.2, 1.6, 1.0),   // Swings wide right to avoid center
-        new THREE.Vector3(1.0, 1.5, -1.0),  // Swings wide back
-        new THREE.Vector3(-1.0, 1.4, -2.0), // Deep back
-        new THREE.Vector3(-2.5, 1.3, -1.0), // Wide left
-        new THREE.Vector3(-2.5, 1.3, 0.5)   // Meets anterior
+        new THREE.Vector3(0.8, 1.6, -0.5),  
+        new THREE.Vector3(-1.0, 1.4, -1.8), 
+        new THREE.Vector3(-2.2, 1.3, -0.8), 
+        new THREE.Vector3(-2.2, 1.3, 0.5)   
     ]);
     var postCircumflexMesh = new THREE.Mesh(new THREE.TubeGeometry(postCircumflexPath, 40, 0.1, 8, false), arteryMat);
     postCircumflexMesh.userData = { name: "Posterior Circumflex Humeral Artery" };
     vascularGroup.add(postCircumflexMesh);
 
-    // 4. Suprascapular Artery (Over the scapula, raised higher)
+    // 4. Suprascapular Artery (Over the scapula)
     var supraPath = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(3.0, 6.2, 3.0), // Raised even higher over the AC joint
-        new THREE.Vector3(1.0, 6.0, 1.0),
-        new THREE.Vector3(-0.5, 5.5, -1.0),
+        new THREE.Vector3(3.0, 5.0, 3.0),
+        new THREE.Vector3(1.0, 5.2, 1.0),
+        new THREE.Vector3(-0.5, 5.0, -1.0),
         new THREE.Vector3(-1.5, 4.0, -1.5)
     ]);
     vascularGroup.add(new THREE.Mesh(new THREE.TubeGeometry(supraPath, 40, 0.09, 8, false), arteryMat));
@@ -987,56 +986,6 @@ function init3D() {
     setTimeout(function() {
         if (implantSelect) updateImplantSelection(implantSelect.value);
     }, 100);
-
-    // =================================================================
-    // HOVER TOOLTIP RAYCASTER LOGIC
-    // =================================================================
-    var raycaster = new THREE.Raycaster();
-    var mouse = new THREE.Vector2();
-    var tooltip = document.getElementById('tooltip');
-
-    window.addEventListener('mousemove', function(event) {
-        if (!boneGroup || !tooltip) return;
-
-        // Calculate mouse position in normalized device coordinates (-1 to +1)
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-        raycaster.setFromCamera(mouse, camera);
-
-        // Find intersections with all children of boneGroup
-        var intersects = raycaster.intersectObjects(boneGroup.children, true);
-
-        // Filter out invisible objects (like hidden veins or transparent x-ray bones)
-        var visibleIntersects = intersects.filter(function(intersect) {
-            return intersect.object.visible && (!intersect.object.material.transparent || intersect.object.material.opacity > 0.5);
-        });
-
-        if (visibleIntersects.length > 0) {
-            // Get the first intersected object that has a userData.name
-            var target = null;
-            for (var i = 0; i < visibleIntersects.length; i++) {
-                if (visibleIntersects[i].object.userData && visibleIntersects[i].object.userData.name) {
-                    target = visibleIntersects[i].object;
-                    break;
-                }
-            }
-
-            if (target) {
-                tooltip.style.display = 'block';
-                tooltip.innerHTML = target.userData.name;
-                tooltip.style.left = (event.clientX + 15) + 'px';
-                tooltip.style.top = (event.clientY + 15) + 'px';
-                document.body.style.cursor = 'crosshair';
-            } else {
-                tooltip.style.display = 'none';
-                document.body.style.cursor = 'default';
-            }
-        } else {
-            tooltip.style.display = 'none';
-            document.body.style.cursor = 'default';
-        }
-    }, false);
 
     implantSelect.addEventListener('change', function() {
             var val = implantSelect.value;
