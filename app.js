@@ -376,9 +376,12 @@ function buildBone() {
     ];
     var humerusGeo = createBoneLathe(humerusProfile, 48);
     perturbVertices(humerusGeo, 0.012);
-    var humerusMesh = new THREE.Mesh(humerusGeo, corticalMat);
-    humerusMesh.castShadow = true;
-    humerusGroup.add(humerusMesh);
+    var humerusHead = new THREE.Mesh(humerusGeo, corticalMat);
+    humerusHead.userData = { name: "Humerus Head (Resected Area)" };
+    humerusGroup.add(humerusHead);
+    var humerusShaft = new THREE.Mesh(humerusGeo, corticalMat);
+    humerusShaft.userData = { name: "Humerus Bone" };
+    humerusGroup.add(humerusShaft);
 
 
 
@@ -481,12 +484,13 @@ function buildBone() {
         new THREE.Vector2(0.5,   0.3),
         new THREE.Vector2(0.01,  0.35),
     ];
-    var glenoidGeo = createBoneLathe(glenoidProfile, 32);
-    perturbVertices(glenoidGeo, 0.015);
-    var glenoidMesh = new THREE.Mesh(glenoidGeo, corticalMat);
-    glenoidMesh.rotation.z = Math.PI / 2;
-    glenoidMesh.position.set(0.8, 3.5, 0);
-    scapulaGroup.add(glenoidMesh);
+    var socketGeo = createBoneLathe(glenoidProfile, 32);
+    perturbVertices(socketGeo, 0.015);
+    var socket = new THREE.Mesh(socketGeo, corticalMat);
+    socket.userData = { name: "Glenoid Socket (Scapula)" };
+    scapulaGroup.add(socket);
+    socket.rotation.z = Math.PI / 2;
+    socket.position.set(0.8, 3.5, 0);
 
     // Scapular Neck
     var neckPath = new THREE.CatmullRomCurve3([
@@ -580,7 +584,9 @@ function buildBone() {
     ]);
     var clavGeo = new THREE.TubeGeometry(clavPath, 24, 0.35, 10, false);
     perturbVertices(clavGeo, 0.018);
-    scapulaGroup.add(new THREE.Mesh(clavGeo, corticalMat));
+    var clavMesh = new THREE.Mesh(clavGeo, corticalMat);
+    clavMesh.userData = { name: "Clavicle (Collarbone)" };
+    scapulaGroup.add(clavMesh);
 
     // Sternal end
     var sternalEnd = new THREE.Mesh(new THREE.SphereGeometry(0.45, 12, 12), corticalMat);
@@ -614,26 +620,33 @@ function buildBone() {
         new THREE.Vector3(0.8, -5.0, 1.5),
         new THREE.Vector3(1.0, -8.0, 1.3)
     ]);
-    vascularGroup.add(new THREE.Mesh(new THREE.TubeGeometry(axillaryPath, 64, 0.18, 8, false), arteryMat));
+    var axillaryMesh = new THREE.Mesh(new THREE.TubeGeometry(axillaryPath, 64, 0.18, 8, false), arteryMat);
+    axillaryMesh.userData = { name: "Axillary Artery" };
+    vascularGroup.add(axillaryMesh);
 
     // 2. Anterior Circumflex Humeral Artery (Wraps front of surgical neck closely)
     var antCircumflexPath = new THREE.CatmullRomCurve3([
         new THREE.Vector3(-0.1, 1.5, 2.2),  
-        new THREE.Vector3(-0.8, 1.5, 2.2),  
-        new THREE.Vector3(-1.8, 1.4, 1.5),
-        new THREE.Vector3(-2.2, 1.3, 0.5)
+        new THREE.Vector3(-0.8, 1.5, 2.5),  // Pushed further out in Z
+        new THREE.Vector3(-2.0, 1.4, 2.0),  // Pushed further out in X and Z
+        new THREE.Vector3(-2.5, 1.3, 0.5)   // Ends further out
     ]);
-    vascularGroup.add(new THREE.Mesh(new THREE.TubeGeometry(antCircumflexPath, 32, 0.08, 8, false), arteryMat));
+    var antCircumflexMesh = new THREE.Mesh(new THREE.TubeGeometry(antCircumflexPath, 32, 0.08, 8, false), arteryMat);
+    antCircumflexMesh.userData = { name: "Anterior Circumflex Humeral Artery" };
+    vascularGroup.add(antCircumflexMesh);
 
     // 3. Posterior Circumflex Humeral Artery (Wraps back of surgical neck)
     var postCircumflexPath = new THREE.CatmullRomCurve3([
         new THREE.Vector3(-0.1, 1.5, 2.2),  
-        new THREE.Vector3(0.5, 1.6, -0.5),  
-        new THREE.Vector3(-1.0, 1.4, -1.5),
-        new THREE.Vector3(-2.2, 1.3, -0.5),
-        new THREE.Vector3(-2.2, 1.3, 0.5)   
+        new THREE.Vector3(1.2, 1.6, 1.0),   // Swings wide right to avoid center
+        new THREE.Vector3(1.0, 1.5, -1.0),  // Swings wide back
+        new THREE.Vector3(-1.0, 1.4, -2.0), // Deep back
+        new THREE.Vector3(-2.5, 1.3, -1.0), // Wide left
+        new THREE.Vector3(-2.5, 1.3, 0.5)   // Meets anterior
     ]);
-    vascularGroup.add(new THREE.Mesh(new THREE.TubeGeometry(postCircumflexPath, 40, 0.1, 8, false), arteryMat));
+    var postCircumflexMesh = new THREE.Mesh(new THREE.TubeGeometry(postCircumflexPath, 40, 0.1, 8, false), arteryMat);
+    postCircumflexMesh.userData = { name: "Posterior Circumflex Humeral Artery" };
+    vascularGroup.add(postCircumflexMesh);
 
     // 4. Suprascapular Artery (Over the scapula, raised higher)
     var supraPath = new THREE.CatmullRomCurve3([
@@ -653,7 +666,9 @@ function buildBone() {
         new THREE.Vector3(0.6, -5.2, 1.8),
         new THREE.Vector3(0.8, -8.2, 1.6)
     ]);
-    vascularGroup.add(new THREE.Mesh(new THREE.TubeGeometry(axillaryVeinPath, 64, 0.22, 8, false), veinMat));
+    var axillaryVeinMesh = new THREE.Mesh(new THREE.TubeGeometry(axillaryVeinPath, 64, 0.22, 8, false), veinMat);
+    axillaryVeinMesh.userData = { name: "Axillary Vein" };
+    vascularGroup.add(axillaryVeinMesh);
 
     // 6. Cephalic Vein (Superficial lateral vein, pushed out to avoid humerus intersection)
     var cephalicPath = new THREE.CatmullRomCurve3([
@@ -664,7 +679,9 @@ function buildBone() {
         new THREE.Vector3(-2.2, -4.0, 1.8),
         new THREE.Vector3(-1.8, -8.0, 1.5)
     ]);
-    vascularGroup.add(new THREE.Mesh(new THREE.TubeGeometry(cephalicPath, 64, 0.15, 8, false), veinMat));
+    var cephalicVeinMesh = new THREE.Mesh(new THREE.TubeGeometry(cephalicPath, 64, 0.15, 8, false), veinMat);
+    cephalicVeinMesh.userData = { name: "Cephalic Vein" };
+    vascularGroup.add(cephalicVeinMesh);
 
     // =================================================================
     // ASSEMBLE
@@ -734,6 +751,7 @@ function buildImplant(sizeKey) {
         titanium
     );
     stem.name = 'implant';
+    stem.userData = { name: "Titanium Implant Stem" };
     stem.rotation.x = Math.PI;
     stem.position.y = -0.9; // Just below the collar
     stem.castShadow = true;
@@ -965,7 +983,62 @@ function init3D() {
     // Implant dropdown
     var implantSelect = document.querySelector('select.custom-select');
     if (implantSelect) {
-        implantSelect.addEventListener('change', function() {
+       // Trigger initial calculation
+    setTimeout(function() {
+        if (implantSelect) updateImplantSelection(implantSelect.value);
+    }, 100);
+
+    // =================================================================
+    // HOVER TOOLTIP RAYCASTER LOGIC
+    // =================================================================
+    var raycaster = new THREE.Raycaster();
+    var mouse = new THREE.Vector2();
+    var tooltip = document.getElementById('tooltip');
+
+    window.addEventListener('mousemove', function(event) {
+        if (!boneGroup || !tooltip) return;
+
+        // Calculate mouse position in normalized device coordinates (-1 to +1)
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        raycaster.setFromCamera(mouse, camera);
+
+        // Find intersections with all children of boneGroup
+        var intersects = raycaster.intersectObjects(boneGroup.children, true);
+
+        // Filter out invisible objects (like hidden veins or transparent x-ray bones)
+        var visibleIntersects = intersects.filter(function(intersect) {
+            return intersect.object.visible && (!intersect.object.material.transparent || intersect.object.material.opacity > 0.5);
+        });
+
+        if (visibleIntersects.length > 0) {
+            // Get the first intersected object that has a userData.name
+            var target = null;
+            for (var i = 0; i < visibleIntersects.length; i++) {
+                if (visibleIntersects[i].object.userData && visibleIntersects[i].object.userData.name) {
+                    target = visibleIntersects[i].object;
+                    break;
+                }
+            }
+
+            if (target) {
+                tooltip.style.display = 'block';
+                tooltip.innerHTML = target.userData.name;
+                tooltip.style.left = (event.clientX + 15) + 'px';
+                tooltip.style.top = (event.clientY + 15) + 'px';
+                document.body.style.cursor = 'crosshair';
+            } else {
+                tooltip.style.display = 'none';
+                document.body.style.cursor = 'default';
+            }
+        } else {
+            tooltip.style.display = 'none';
+            document.body.style.cursor = 'default';
+        }
+    }, false);
+
+    implantSelect.addEventListener('change', function() {
             var val = implantSelect.value;
             var sizeKey = val.indexOf('45') >= 0 ? '45mm' : val.indexOf('48') >= 0 ? '48mm' : '52mm';
 
