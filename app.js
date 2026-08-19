@@ -605,64 +605,64 @@ function buildBone() {
     var arteryMat = new THREE.MeshPhongMaterial({ color: 0xff3333, shininess: 40 });
     var veinMat = new THREE.MeshPhongMaterial({ color: 0x3366ff, shininess: 40 });
 
-    // 1. Subclavian to Axillary Artery (Main descending supply)
+    // 1. Subclavian to Axillary Artery (Main descending supply - brought forward and down)
     var axillaryPath = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(5.0, 5.0, 3.5), // Subclavian origin
-        new THREE.Vector3(2.0, 3.5, 2.5), // Under clavicle
-        new THREE.Vector3(-0.2, 2.0, 1.8), // Past glenoid
-        new THREE.Vector3(0.0, -1.0, 1.2), // Down medial humerus
-        new THREE.Vector3(0.3, -5.0, 1.0),
-        new THREE.Vector3(0.5, -8.0, 0.8)
+        new THREE.Vector3(5.0, 4.5, 4.5), // Lowered and brought forward to clear clavicle
+        new THREE.Vector3(2.0, 3.0, 3.0), // Under clavicle
+        new THREE.Vector3(-0.2, 1.5, 2.2), // Past glenoid, well in front
+        new THREE.Vector3(0.5, -1.0, 1.8), // Down medial humerus
+        new THREE.Vector3(0.8, -5.0, 1.5),
+        new THREE.Vector3(1.0, -8.0, 1.3)
     ]);
     vascularGroup.add(new THREE.Mesh(new THREE.TubeGeometry(axillaryPath, 64, 0.18, 8, false), arteryMat));
 
-    // 2. Anterior Circumflex Humeral Artery (Wraps front of surgical neck)
+    // 2. Anterior Circumflex Humeral Artery (Wraps front of surgical neck closely)
     var antCircumflexPath = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(-0.1, 1.5, 1.7),  // Branches from Axillary
-        new THREE.Vector3(-0.5, 1.3, 2.5),  // Front of humerus
-        new THREE.Vector3(-1.2, 1.2, 2.2),
-        new THREE.Vector3(-1.8, 1.1, 1.0)
+        new THREE.Vector3(-0.1, 1.5, 2.2),  // Branches from Axillary
+        new THREE.Vector3(-0.8, 1.5, 2.2),  // Front of humerus (pushed forward)
+        new THREE.Vector3(-1.8, 1.4, 1.5),
+        new THREE.Vector3(-2.2, 1.3, 0.5)
     ]);
     vascularGroup.add(new THREE.Mesh(new THREE.TubeGeometry(antCircumflexPath, 32, 0.08, 8, false), arteryMat));
 
-    // 3. Posterior Circumflex Humeral Artery (Wraps back of surgical neck - CRITICAL for surgery)
+    // 3. Posterior Circumflex Humeral Artery (Wraps back of surgical neck)
     var postCircumflexPath = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(-0.1, 1.8, 1.7),  // Branches from Axillary
-        new THREE.Vector3(-0.4, 1.6, 0.2),  // Back of humerus
-        new THREE.Vector3(-1.5, 1.4, -0.5),
-        new THREE.Vector3(-2.2, 1.2, 0.8),
-        new THREE.Vector3(-1.8, 1.1, 1.0)   // Anastomoses with Anterior
+        new THREE.Vector3(-0.1, 1.5, 2.2),  // Branches from Axillary
+        new THREE.Vector3(0.5, 1.6, -0.5),  // Pushed further back behind humerus
+        new THREE.Vector3(-1.0, 1.4, -1.5),
+        new THREE.Vector3(-2.2, 1.3, -0.5),
+        new THREE.Vector3(-2.2, 1.3, 0.5)   // Anastomoses with Anterior
     ]);
     vascularGroup.add(new THREE.Mesh(new THREE.TubeGeometry(postCircumflexPath, 40, 0.1, 8, false), arteryMat));
 
-    // 4. Suprascapular Artery (Over the scapula)
+    // 4. Suprascapular Artery (Over the scapula, raised higher)
     var supraPath = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(3.0, 4.5, 3.0),
-        new THREE.Vector3(1.0, 5.0, 1.0),
-        new THREE.Vector3(-0.5, 4.8, -0.5),
-        new THREE.Vector3(-1.5, 3.5, -1.0)
+        new THREE.Vector3(3.0, 5.5, 3.0), // Raised above clavicle
+        new THREE.Vector3(1.0, 5.8, 1.0),
+        new THREE.Vector3(-0.5, 5.5, -1.0),
+        new THREE.Vector3(-1.5, 4.0, -1.5)
     ]);
     vascularGroup.add(new THREE.Mesh(new THREE.TubeGeometry(supraPath, 40, 0.09, 8, false), arteryMat));
 
-    // 5. Axillary Vein (Main venous return, runs parallel to Axillary Artery)
+    // 5. Axillary Vein (Runs parallel to Axillary Artery, slightly more medial/forward)
     var axillaryVeinPath = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(4.8, 4.8, 3.8),
-        new THREE.Vector3(1.8, 3.3, 2.8),
-        new THREE.Vector3(-0.4, 1.8, 2.1),
-        new THREE.Vector3(-0.2, -1.2, 1.5),
-        new THREE.Vector3(0.1, -5.2, 1.3),
-        new THREE.Vector3(0.3, -8.2, 1.1)
+        new THREE.Vector3(4.8, 4.2, 4.8),
+        new THREE.Vector3(1.8, 2.8, 3.3),
+        new THREE.Vector3(-0.4, 1.3, 2.5),
+        new THREE.Vector3(0.3, -1.2, 2.1),
+        new THREE.Vector3(0.6, -5.2, 1.8),
+        new THREE.Vector3(0.8, -8.2, 1.6)
     ]);
     vascularGroup.add(new THREE.Mesh(new THREE.TubeGeometry(axillaryVeinPath, 64, 0.22, 8, false), veinMat));
 
-    // 6. Cephalic Vein (Running superficial on the lateral side)
+    // 6. Cephalic Vein (Superficial lateral vein, pushed out to avoid humerus intersection)
     var cephalicPath = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(2.5, 4.2, 3.2),
-        new THREE.Vector3(0.5, 3.5, 3.0),
-        new THREE.Vector3(-1.5, 2.0, 2.5),
-        new THREE.Vector3(-2.0, 0.0, 1.8),
-        new THREE.Vector3(-1.8, -4.0, 1.5),
-        new THREE.Vector3(-1.5, -8.0, 1.2)
+        new THREE.Vector3(2.5, 4.8, 4.2),
+        new THREE.Vector3(0.5, 4.0, 3.8),
+        new THREE.Vector3(-2.0, 2.5, 3.0),
+        new THREE.Vector3(-2.5, 0.0, 2.2),
+        new THREE.Vector3(-2.2, -4.0, 1.8),
+        new THREE.Vector3(-1.8, -8.0, 1.5)
     ]);
     vascularGroup.add(new THREE.Mesh(new THREE.TubeGeometry(cephalicPath, 64, 0.15, 8, false), veinMat));
 
